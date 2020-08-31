@@ -19,5 +19,11 @@
     {% for user in users %}
         <li>{{ user.name }} - you won {{ random_gift[loop.index0] }}</li>
     {% endfor %}
+
+    {% for message in  app.flashes('notice') %}
+        <div class="flash-notice">
+            {{ message }}
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}
