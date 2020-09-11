@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Address;
 use App\Entity\User;
+use App\Entity\Videos;
 use App\Services\GiftService;
 use Couchbase\GeoBoundingBoxSearchQuery;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,14 +26,25 @@ class DefaultController extends AbstractController
     /**
      * @Route("/", name="default")
      */
-    public function index(GiftService $gifts, Request $request)
+    public function index(Request $request)
     {
-       $users = $this->getDoctrine()->getRepository(User::class)->findAll();
 
-        return $this->render('default/index.html.twig', [
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $user = new User();
+        $user->setName('John');
+        $address = new Address();
+        $address->setStreet('street');
+        $address->setNumber(23);
+        $user->setAddress($address);
+        $entityManager->persist($user);
+      //  $entityManager->persist($address);
+        $entityManager->flush();
+        dump($user->getAddress()->getStreet());
+
+       return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
-            'users' => $users,
-            'random_gift'=>$gifts->gifts,
+
         ]);
     }
 

@@ -16,14 +16,8 @@
         <li>Your controller at <code><a href="{{ '/var/www/html/src/Controller/DefaultController.php'|file_link(0) }}">src/Controller/DefaultController.php</a></code></li>
         <li>Your template at <code><a href="{{ '/var/www/html/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
     </ul>
-    {% for user in users %}
-        <li>{{ user.name }} - you won {{ random_gift[loop.index0] }}</li>
-    {% endfor %}
 
-    {% for message in  app.flashes('notice') %}
-        <div class="flash-notice">
-            {{ message }}
-        </div>
-    {% endfor %}
+
+
 </div>
 {% endblock %}
