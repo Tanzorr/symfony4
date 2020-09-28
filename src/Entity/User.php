@@ -53,6 +53,11 @@ class User
      */
     private $following;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $folowing;
+
     public function __construct()
     {
         $this->videos = new ArrayCollection();
@@ -170,6 +175,18 @@ class User
             $this->following->removeElement($following);
             $following->removeFollowed($this);
         }
+
+        return $this;
+    }
+
+    public function getFolowing(): ?string
+    {
+        return $this->folowing;
+    }
+
+    public function setFolowing(string $folowing): self
+    {
+        $this->folowing = $folowing;
 
         return $this;
     }
