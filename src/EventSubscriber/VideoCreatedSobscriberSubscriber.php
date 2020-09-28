@@ -14,17 +14,28 @@ class VideoCreatedSobscriberSubscriber implements EventSubscriberInterface
         dump($event->video->title);
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse1(FilterResponseEvent $event)
     {
         $response = new Response('dupa');
         $event->setResponse($response);
+        dump(2);
+    }
+
+    public function onKernelResponse2(FilterResponseEvent $event)
+    {
+       // $response = new Response('dupa1');
+       // $event->setResponse($response);
+        dump(1);
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            'video.created.event' => 'onVideoCreatedEvent',
-            KernelEvents::RESPONSE =>'onKernelResponse'
+//            'video.created.event' => 'onVideoCreatedEvent',
+//            KernelEvents::RESPONSE =>[
+//                ['onKernelResponse1',2],
+//                ['onKernelResponse2',1],
+//                ]
         ];
     }
 }

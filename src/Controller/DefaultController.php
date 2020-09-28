@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Address;
 use App\Entity\User;
-use App\Entity\Videos;
+use App\Entity\Video;
 use App\Services\GiftService;
 use Couchbase\GeoBoundingBoxSearchQuery;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Events\VideoCreatedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Form\VideoFormType;
 
 
 class DefaultController extends AbstractController
@@ -32,17 +33,37 @@ class DefaultController extends AbstractController
     public function index(Request $request)
     {
 
-      //    $entityManager = $this->getDoctrine()->getManager();
-            $video = new \stdClass();
-            $video->title = 'Funny movie';
-            $video->category = 'funny';
+           $entityManager = $this->getDoctrine()->getManager();
+           $videos = $entityManager->getRepository(Video::class)->findAll();
+           dump($videos);
+            $video = new Video();
+           $video->setTitle('Writ a blog post');
+           $video->getCreatedAt(new \DateTime('tomorrow'));
 
-            $event = new VideoCreatedEvent($video);
+        //$video = $entityManager->getRepository(Video::class)->find(1);
 
-            $this->dispatcher->dispatch('video.created.event', $event);
+
+           $form = $this->createForm(VideoFormType::class, $video);
+
+            $form->handleRequest($request);
+           if ($form->isSubmitted() && $form->isValid())
+           {
+               $file = $form->get('file')->getData();
+               dump($file);
+               $fileName = sha1(random_bytes(14)).'.'.$file->guessExtension();
+               $file->move(
+                   $this->getParameter('videos_directory'),
+                   $fileName
+               );
+               $video->setFile($fileName);
+               $entityManager->persist($video);
+               $entityManager->flush();
+               return $this->redirectToRoute('default');
+           }
 
        return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
+           'form'=>$form->createView(),
 
         ]);
     }
