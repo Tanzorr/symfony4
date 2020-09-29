@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Address;
+use App\Entity\SecurityUser;
 use App\Entity\User;
 use App\Entity\Video;
+use App\Form\RegisterUserType;
 use App\Services\GiftService;
 use Couchbase\GeoBoundingBoxSearchQuery;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +19,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Events\VideoCreatedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Form\VideoFormType;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
 class DefaultController extends AbstractController
@@ -30,42 +34,32 @@ class DefaultController extends AbstractController
     /**
      * @Route("/", name="default")
      */
-    public function index(Request $request)
+    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
 
-           $entityManager = $this->getDoctrine()->getManager();
-           $videos = $entityManager->getRepository(Video::class)->findAll();
-           dump($videos);
-            $video = new Video();
-           $video->setTitle('Writ a blog post');
-           $video->getCreatedAt(new \DateTime('tomorrow'));
+        $user = new SecurityUser();
+        $entityManager  = $this->getDoctrine()->getManager();
+        $users = $entityManager->getRepository(SecurityUser::class)->findAll();
+        dump($users);
+        $form = $this->createForm(RegisterUserType::class, $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword(
+                $passwordEncoder->encodePassword($user, $form->get('password')->getViewData()['first'])
+            );
+            $user->setEmail($form->get('email')->getData());
 
-        //$video = $entityManager->getRepository(Video::class)->find(1);
+            $entityManager->persist($user);
+            $entityManager->flush();
+            return  $this->redirectToRoute('default');
+        }
 
 
-           $form = $this->createForm(VideoFormType::class, $video);
-
-            $form->handleRequest($request);
-           if ($form->isSubmitted() && $form->isValid())
-           {
-               $file = $form->get('file')->getData();
-               dump($file);
-               $fileName = sha1(random_bytes(14)).'.'.$file->guessExtension();
-               $file->move(
-                   $this->getParameter('videos_directory'),
-                   $fileName
-               );
-               $video->setFile($fileName);
-               $entityManager->persist($video);
-               $entityManager->flush();
-               return $this->redirectToRoute('default');
-           }
 
        return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
-           'form'=>$form->createView(),
-
-        ]);
+           'form' => $form->createView(),
+       ]);
     }
 
 
