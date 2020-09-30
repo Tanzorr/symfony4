@@ -9,6 +9,7 @@ use App\Entity\Video;
 use App\Form\RegisterUserType;
 use App\Services\GiftService;
 use Couchbase\GeoBoundingBoxSearchQuery;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Form\VideoFormType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Translation\TranslatorInterface;
 
 
 class DefaultController extends AbstractController
@@ -32,34 +35,38 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/", name="default")
+     * @Route("/", name="home")
+     *
      */
-    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function index(Request $request,TranslatorInterface $translator)
     {
+        //$entityManager  = $this->getDoctrine()->getManager();
 
-        $user = new SecurityUser();
-        $entityManager  = $this->getDoctrine()->getManager();
-        $users = $entityManager->getRepository(SecurityUser::class)->findAll();
-        dump($users);
-        $form = $this->createForm(RegisterUserType::class, $user);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword(
-                $passwordEncoder->encodePassword($user, $form->get('password')->getViewData()['first'])
-            );
-            $user->setEmail($form->get('email')->getData());
+        $translated = $translator->trans('some.key');
+        dump($translated);
 
-            $entityManager->persist($user);
-            $entityManager->flush();
-            return  $this->redirectToRoute('default');
-        }
-
-
-
-       return $this->render('default/index.html.twig', [
+        return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
-           'form' => $form->createView(),
-       ]);
+        ]);
+    }
+
+     /**
+      * @Route({
+      *     "en": "/login",
+      *     "pl": "/logowanie",
+
+*     }, name="login")
+      */
+
+    public function login(AuthenticationUtils $authenticationUtils) {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', array(
+            'last_name' => $lastUsername,
+            'error' => $error,
+        ));
+
     }
 
 
