@@ -30,7 +30,7 @@ class Video
     private $path;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $duration;
 
@@ -38,6 +38,8 @@ class Video
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="videos")
      */
     private $category;
+
+    private $paginated;
 
     public function getId(): ?int
     {
@@ -73,7 +75,7 @@ class Video
         return $this->duration;
     }
 
-    public function setDuration(int $duration): self
+    public function setDuration(?int $duration): self
     {
         $this->duration = $duration;
 
