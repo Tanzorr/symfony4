@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Utils\CategoryTreeFrontPage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Video;
 
@@ -22,10 +23,13 @@ class FrontController extends AbstractController
     /**
      * @Route("/video-list/category/{categoryname},{id}/{page}", defaults = {"page":1}, name="video_list")
      */
-    public function videoList($id, $page, CategoryTreeFrontPage $categories)
+    public function videoList($id, $page, CategoryTreeFrontPage $categories, Request $request)
     {
        $categories->getCategoryListParent($id);
-       $videos = $this->getDoctrine()->getRepository(Video::class)->findByPaginate($page);
+       $ids = $categories->getChildIds($id);
+       array_push($ids, $id);
+       $videos = $this->getDoctrine()->getRepository(Video::class)->findByPaginate($ids, $page,
+           $request->get('sortby'));
 
        return $this->render('front/video_list.htm.twig',
             ['subcategories' => $categories,
@@ -43,11 +47,26 @@ class FrontController extends AbstractController
     }
 
     /**
-     * @Route("/search-results", methods={"POST"}, name="search-results")
+     * @Route("/search-results", methods={"GET"}, name="search-results", defaults={"page": 1})
      */
-    public function searchResults()
+    public function searchResults($page, Request $request)
     {
-        return $this->render('front/search_results.htm.twig');
+        $query = null;
+        $videos = null;
+        if ($query = $request->get('query'))
+        {
+            $videos = $this->getDoctrine()
+                ->getRepository(Video::class)
+                ->findByTitle($query, $page, $request->get('sortby'));
+            if (!$videos->getItems()) $videos = null;
+        }
+
+        return $this->render('front/search_results.html.twig',[
+            'videos'=>$videos,
+            'query'=>$query
+        ]);
+
+
     }
 
     /**
