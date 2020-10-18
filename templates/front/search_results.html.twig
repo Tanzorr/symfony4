@@ -7,6 +7,7 @@
             <h1 class="jumbotron-heading">Search results</h1>
             {{ include('front/includes/_videos.html.twig', {'videos':query}) }}
             {% else %}
+                <h1 class="jumbotron-heading">No results</h1>
             {% endif %}
         </div>
     </section>

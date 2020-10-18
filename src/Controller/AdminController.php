@@ -30,7 +30,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/categories", name="categories", methods={"GET","POST"})
+     * @Route("/su/categories", name="categories", methods={"GET","POST"})
      */
     public function categories(CategoryTreeAdminList $categories, Request $request)
     {
@@ -150,6 +150,8 @@ class AdminController extends AbstractController
 
     public function getAllCategories(CategoryTreeAdminOptionList $categories, $editedCategory = null)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $categories->getCategoryList($categories->buildTree());
         return $this->render('admin/_all_categories.html.twig', [
             'categories' => $categories,

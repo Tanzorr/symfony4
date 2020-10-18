@@ -1,14 +1,14 @@
 security:
     encoders:
-        App\Entity\SecurityUser:
-            algorithm: argon2i
+        App\Entity\User:
+            algorithm: bcrypt
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Entity\SecurityUser
+                class: App\Entity\User
                 property: email
     firewalls:
         dev:
@@ -23,21 +23,23 @@ security:
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
 
             form_login:
-                login_path: login
                 check_path: login
-                # https://symfony.com/doc/current/security/form_login_setup.html
-                # csrf_token_generator: security.csrf.token_manager
-                username_parameter: 'email'
-                password_parameter: 'password'
+                login_path: login
                 csrf_token_generator: security.csrf.token_manager
-
-            logout:
-                    path:   /logout
-                    target: /home
-
+                default_target_path: admin_main_page
+                username_parameter: _email
             # https://symfony.com/doc/current/security/form_login_setup.html
+            logout:
+                path: logout
+                target: main_page
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+                path: /
+
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+      - { path: ^/admin/su, roles: ROLE_ADMIN }
+      - { path: ^/admin, roles: ROLE_USER }
+      - { path: ^/profile, roles: ROLE_USER }

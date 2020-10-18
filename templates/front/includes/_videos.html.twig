@@ -7,11 +7,22 @@
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <div align="center" class="embed-responsive embed-responsive-16by9">
-                            <iframe class="" src="{{video.getPath()}}" frameborder="0"
-                                    allowfullscreen></iframe>
+                            {% if is_granted('IS_AUTHENTICATED_REMEMEBERED') %}
+                                <iframe class="" src="{{video.getPath()}}" frameborder="0"
+                                        allowfullscreen></iframe>
+                                {% else %}
+                                    <iframe class="" src="https://palayer.vimeo.com/video/113716040" frameborder="0"
+                                            allowfullscreen></iframe>
+                            {% endif %}
+
                         </div>
                         <div class="card-body">
                             <h3>{{video.getTitle()}}</h3>
+                            {% if not app.user %}
+                                <p class="card-text text-danger">
+                                    <b>MEMBERS</b>only. <a href="{{ path('pricing') }}">Sign up</a>
+                            for one month for free.</p>
+                            {% endif %}
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
 
