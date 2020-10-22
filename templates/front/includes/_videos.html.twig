@@ -7,14 +7,8 @@
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <div align="center" class="embed-responsive embed-responsive-16by9">
-                            {% if is_granted('IS_AUTHENTICATED_REMEMEBERED') %}
-                                <iframe class="" src="{{video.getPath()}}" frameborder="0"
+                            <iframe class="" src="{{video.vimeoid(app.user)}}" frameborder="0"
                                         allowfullscreen></iframe>
-                                {% else %}
-                                    <iframe class="" src="https://palayer.vimeo.com/video/113716040" frameborder="0"
-                                            allowfullscreen></iframe>
-                            {% endif %}
-
                         </div>
                         <div class="card-body">
                             <h3>{{video.getTitle()}}</h3>
@@ -42,7 +36,7 @@
                                     <!-- <button data-toggle="tooltip" data-placement="top" title="You don't like the video. Click to undo" type="button" class="btn btn-primary btn-outline-danger btn-sm mr-2">
                                     <i class="fa fa-thumbs-down"></i>
                                     </button> -->
-                                    <a href="{{path('video_details')}}#video_comments">Comments (32)</a>
+                                    <a href="{{path('video-details',{'video':video.id})}}#video_comments">Comments {{ video.comments.count }}</a>
                                 </div>
                                 <small class="text-muted">{{video.getDuration()}} mins</small>
                             </div>
@@ -52,25 +46,25 @@
             {% endfor %}
 
             <!-- no members -->
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <div align="center" class="embed-responsive embed-responsive-16by9">
-                        <iframe class="" src="https://player.vimeo.com/video/113716040" frameborder="0"
-                                allowfullscreen></iframe>
-                    </div>
-                    <div class="card-body">
-                        <h3>Video title</h3>
-                        <p class="card-text text-danger">Video for <b>MEMBERS</b> only. <a href="pricing.php">Sign
-                                up</a> for one month for free.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
+{#            <div class="col-md-4">#}
+{#                <div class="card mb-4 shadow-sm">#}
+{#                    <div align="center" class="embed-responsive embed-responsive-16by9">#}
+{#                        <iframe class="" src="https://player.vimeo.com/video/113716040" frameborder="0"#}
+{#                                allowfullscreen></iframe>#}
+{#                    </div>#}
+{#                    <div class="card-body">#}
+{#                        <h3>Video title</h3>#}
+{#                        <p class="card-text text-danger">Video for <b>MEMBERS</b> only. <a href="pricing.php">Sign#}
+{#                                up</a> for one month for free.</p>#}
+{#                        <div class="d-flex justify-content-between align-items-center">#}
+{#                            <div class="btn-group">#}
 
-                                <i class="fa fa-thumbs-up mr-2"><small class="text-muted">(23)</small></i>
-                                <i class="fa fa-thumbs-down mr-2"><small class="text-muted">(9)</small></i>
+{#                                <i class="fa fa-thumbs-up mr-2"><small class="text-muted">(23)</small></i>#}
+{#                                <i class="fa fa-thumbs-down mr-2"><small class="text-muted">(9)</small></i>#}
 
-                                <a href="{{path('video_details')}}#video_comments">Comments (32)</a>
-                            </div>
-                            <small class="text-muted">9 mins</small>
+{#                                <a href="{{path('video_details')}}#video_comments">Comments (32)</a>#}
+{#                            </div>#}
+{#                            <small class="text-muted">9 mins</small>#}
                         </div>
                     </div>
                 </div>

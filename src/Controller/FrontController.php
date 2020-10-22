@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Comment;
 use App\Utils\CategoryTreeFrontPage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +14,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\VideoRepository;
 
 
 class FrontController extends AbstractController
@@ -44,11 +46,13 @@ class FrontController extends AbstractController
     }
 
     /**
-     * @Route("/video-details", name="video_details")
+     * @Route("/video-details/{video}", name="video-details")
      */
-    public function videoDetails()
+    public function videoDetails(VideoRepository $repo, $video)
     {
-        return $this->render('front/video_details.htm.twig');
+        return $this->render('front/video_details.htm.twig',[
+            'video'=>$repo->videoDetails($video)
+            ]);
     }
 
     /**
