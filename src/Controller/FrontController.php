@@ -56,6 +56,28 @@ class FrontController extends AbstractController
     }
 
     /**
+     * @Route ("/new-comment/{video}", methods={"POST"}, name = "new_comment")
+     */
+
+    public function newComment(Video $video, Request $request)
+    {
+        $this->denyAccessUnlessGranted("IS_AUTHENTICATED_REMEMBERED");
+        if (!empty(trim($request->request->get('comment'))))
+        {
+            $comment = new Comment();
+            $comment->setComment($request->request->get('comment'));
+            $comment->setUser($this->getUser());
+            $comment->setVideo($video);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($comment);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('video-details',['video'=>$video->getId()]);
+    }
+
+    /**
      * @Route("/search-results", methods={"GET"}, name="search-results", defaults={"page": 1})
      */
     public function searchResults($page, Request $request)
