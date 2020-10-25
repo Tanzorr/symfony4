@@ -17,6 +17,7 @@ class Video
 
     public const videoForNotLoggedIn = 113716040;// vimeo id
     public const VimeoPath = 'https://palayer.vimeo.com/video';
+    public const perPage = 5; //for pagination
 
     /**
      * @ORM\Id
@@ -53,9 +54,23 @@ class Video
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedVideos")
+     * @ORM\JoinTable(name = "likes")
+     */
+    private $usersThatLike;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="dislikeVideos")
+     * @ORM\JoinTable(name = "disLikes")
+     */
+    private $userThatDontLike;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->usersThatLike = new ArrayCollection();
+        $this->userThatDontLike = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +164,58 @@ class Video
             if ($comment->getVideo() === $this) {
                 $comment->setVideo(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsersThatLike(): Collection
+    {
+        return $this->usersThatLike;
+    }
+
+    public function addUsersThatLike(User $usersThatLike): self
+    {
+        if (!$this->usersThatLike->contains($usersThatLike)) {
+            $this->usersThatLike[] = $usersThatLike;
+        }
+
+        return $this;
+    }
+
+    public function removeUsersThatLike(User $usersThatLike): self
+    {
+        if ($this->usersThatLike->contains($usersThatLike)) {
+            $this->usersThatLike->removeElement($usersThatLike);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUserThatDontLike(): Collection
+    {
+        return $this->userThatDontLike;
+    }
+
+    public function addUserThatDontLike(User $userThatDontLike): self
+    {
+        if (!$this->userThatDontLike->contains($userThatDontLike)) {
+            $this->userThatDontLike[] = $userThatDontLike;
+        }
+
+        return $this;
+    }
+
+    public function removeUserThatDontLike(User $userThatDontLike): self
+    {
+        if ($this->userThatDontLike->contains($userThatDontLike)) {
+            $this->userThatDontLike->removeElement($userThatDontLike);
         }
 
         return $this;

@@ -38,7 +38,7 @@ class FrontController extends AbstractController
        $videos = $this->getDoctrine()->getRepository(Video::class)->findByPaginate($ids, $page,
            $request->get('sortby'));
 
-       return $this->render('front/video_list.htm.twig',
+       return $this->render('front/video_list.html.twig',
             ['subcategories' => $categories,
              'videos'=>$videos
             ]
@@ -178,6 +178,57 @@ class FrontController extends AbstractController
     {
         return $this->render('front/payment.html.twig');
     }
+
+    /**
+     * @Route("/video-list/{video}/like", name="like_video", methods={"POST"})
+     * @Route("/video-list/{video}/dislike", name="dislike_video", methods={"POST"})
+     * @Route("/video-list/{video}/unlike", name="undo_like_video", methods={"POST"})
+     * @Route("/video-list/{video}/undodislike", name="undo_dislike_video", methods={"POST"})
+     */
+
+    public function toggleLikesAjax(Video $video, Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+        switch ($request->get('_route'))
+        {
+            case 'like_video':
+                $result = $this->likeVideo($video);
+                break;
+                case 'dislike_video':
+                $result = $this->dislikeVideo($video);
+                break;
+            case 'undo_like_video':
+                $result = $this->undoLikeVideo($video);
+                break;
+            case 'undo_dislike_video':
+                $result = $this->undoDisLikeVideo($video);
+                break;
+        }
+
+        return $this->json(['action'=>$result, 'id'=>$video->getId()]);
+    }
+
+    public function likeVideo($video)
+    {
+        return 'liked';
+    }
+
+    public function dislikeVideo($video)
+    {
+        return 'disliked';
+    }
+
+    public function undoLikeVideo($video)
+    {
+        return 'undo liked';
+    }
+
+    public function undoDislikeVideo($video)
+    {
+        return 'undo disliked';
+    }
+
+
 
     public  function mainCategories() {
         $categories = $this->getDoctrine()->getRepository(Category::class)->findBy(['parent'=>null],['name'=>'ASC']);
