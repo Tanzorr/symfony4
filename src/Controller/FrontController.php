@@ -35,7 +35,7 @@ class FrontController extends AbstractController
        $categories->getCategoryListParent($id);
        $ids = $categories->getChildIds($id);
        array_push($ids, $id);
-       $videos = $this->getDoctrine()->getRepository(Video::class)->findByPaginate($ids, $page,
+       $videos = $this->getDoctrine()->getRepository(Video::class)->findByChildIds($ids, $page,
            $request->get('sortby'));
 
        return $this->render('front/video_list.html.twig',
@@ -50,7 +50,8 @@ class FrontController extends AbstractController
      */
     public function videoDetails(VideoRepository $repo, $video)
     {
-        return $this->render('front/video_details.htm.twig',[
+        dump($repo->videoDetails($video));
+        return $this->render('front/video_details.html.twig',[
             'video'=>$repo->videoDetails($video)
             ]);
     }
@@ -68,7 +69,6 @@ class FrontController extends AbstractController
             $comment->setComment($request->request->get('comment'));
             $comment->setUser($this->getUser());
             $comment->setVideo($video);
-
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();
@@ -210,21 +210,43 @@ class FrontController extends AbstractController
 
     public function likeVideo($video)
     {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($this->getUser);
+        $user->addLikedVideo($video);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
         return 'liked';
     }
 
     public function dislikeVideo($video)
     {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($this->getUser);
+        $user->addDislikeVideo($video);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
         return 'disliked';
     }
 
     public function undoLikeVideo($video)
     {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($this->getUser);
+        $user->removeLikedVideo($video);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
         return 'undo liked';
     }
 
     public function undoDislikeVideo($video)
     {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($this->getUser);
+        $user->removeDislikeVideo($video);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
         return 'undo disliked';
     }
 

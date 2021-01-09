@@ -49,3 +49,9 @@
 
 </main>
 {% endblock %}
+{% block customjavascripts %}
+    {{parent()}}
+    {% if app.user %}
+        <script src="{{asset('assets/js/likes.js')}}"></script>
+    {% endif %}
+{% endblock %}
